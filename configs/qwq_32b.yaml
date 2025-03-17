@@ -1,0 +1,21 @@
+run_name: qwq_32b
+num_runs: 1 # Increase this!
+transformer_config:
+  model_name: Qwen/QwQ-32B
+  dtype: bfloat16
+  cache_dir: /cache
+  max_per_device_memory: 30GB
+data_config:
+  bucket_name: main
+  data_key: qwq_cot:CHAT_TEMPLATE 
+  n_batches: 150 # 250000
+  seq_length: 8192
+  batch_size: 2
+  seed: 42
+  skip_cache: True
+  clean_added_tokens: True
+  clean_default_system_prompt: True
+  start_batch: 0
+upload_config:
+  batches_per_upload: 32
+  hooks: ["blocks.24.hook_resid_post", "blocks.36.hook_resid_post", "blocks.48.hook_resid_post", "blocks.56.hook_resid_post"]

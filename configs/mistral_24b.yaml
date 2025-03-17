@@ -1,0 +1,21 @@
+run_name: mistral_24b
+num_runs: 1 # Increase this!
+transformer_config:
+  model_name: mistralai/Mistral-Small-24B-Instruct-2501
+  dtype: bfloat16
+  cache_dir: /cache
+  max_per_device_memory: 50GB
+data_config:
+  bucket_name: main
+  data_key: lmsys:CHAT_TEMPLATE 
+  n_batches: 150 
+  seq_length: 2048
+  batch_size: 4
+  seed: 42
+  skip_cache: False
+  start_batch: 0 
+  clean_added_tokens: True 
+  # clean_default_system_prompt: True # Mistral has a long system prompt
+upload_config:
+  batches_per_upload: 32 
+  hooks: ["blocks.4.hook_resid_post", "blocks.4.hook_attn_post", "blocks.12.hook_resid_post", "blocks.12.hook_mlp_post", "blocks.20.hook_resid_post", "blocks.20.hook_attn_post", "blocks.28.hook_resid_post", "blocks.28.hook_mlp_post"]

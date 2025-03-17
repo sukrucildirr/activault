@@ -1,0 +1,21 @@
+run_name: r1_distill_qwen_32b
+num_runs: 1 # Increase this!
+transformer_config:
+  model_name: deepseek-ai/DeepSeek-R1-Distill-Qwen-32B
+  dtype: bfloat16
+  cache_dir: /cache
+  max_per_device_memory: 40GB
+data_config:
+  bucket_name: main
+  data_key: s1.1 
+  n_batches: 150 # 500
+  seq_length: 8192
+  batch_size: 2
+  seed: 42
+  skip_cache: True
+  start_batch: 0  
+  clean_added_tokens: True
+  clean_default_system_prompt: True
+upload_config:
+  batches_per_upload: 32 
+  hooks: ["blocks.24.hook_resid_post", "blocks.36.hook_mlp_post", "blocks.48.hook_attn_post", "blocks.56.hook_resid_post"]

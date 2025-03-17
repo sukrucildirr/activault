@@ -1,0 +1,21 @@
+run_name: commanda_111b
+num_runs: 1 # Increase this!
+transformer_config:
+  model_name: CohereForAI/c4ai-command-a-03-2025
+  dtype: bfloat16
+  cache_dir: /cache
+  max_per_device_memory: 35GB
+data_config:
+  bucket_name: main
+  data_key: edu
+  n_batches: 64 # 250000
+  seq_length: 2048
+  batch_size: 4
+  seed: 42
+  skip_cache: False
+  start_batch: 0 
+  clean_added_tokens: True
+  # clean_default_system_prompt: True # Cohere has a long system prompt
+upload_config:
+  batches_per_upload: 16
+  hooks: ["blocks.12.hook_resid_post", "blocks.24.hook_resid_post", "blocks.36.hook_resid_post"]

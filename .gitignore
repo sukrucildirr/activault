@@ -1,0 +1,11 @@
+__pycache__/
+.venv/
+.env
+.vscode/
+logs/
+*.out
+*.err
+*temp*
+*.egg-info
+
+benchmark_results/

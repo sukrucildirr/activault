@@ -1,0 +1,63 @@
+{
+    "edu": {
+        "name": "HuggingFaceFW/fineweb-edu",
+        "subset": "sample-100BT",
+        "columns": [
+            "text"
+        ]
+    },
+    "web-instruct:CHAT_TEMPLATE": {
+        "name": "chargoddard/WebInstructSub-prometheus",
+        "chat_template": [
+            "user",
+            "assistant"
+        ],
+        "columns": [
+            "instruction",
+            "generation"
+        ]
+    },
+    "infinity-instruct:CHAT_TEMPLATE": {
+        "name": "BAAI/Infinity-Instruct",
+        "subset": "3M",
+        "columns": [
+            "conversations"
+        ],
+        "filter": {
+            "langdetect": "en"
+        }
+    },
+    "lmsys:CHAT_TEMPLATE": {
+        "name": "OpenLeecher/lmsys_chat_1m_clean",
+        "subset": "default",
+        "columns": [
+            "conversations"
+        ]
+    },
+    "smoltalk:CHAT_TEMPLATE": {
+        "name": "HuggingFaceTB/smoltalk",
+        "subset": "all",
+        "columns": [
+            "messages"
+        ]
+    },
+    "s1.1": {
+        "name": "simplescaling/s1K-1.1_tokenized",
+        "subset": "default",
+        "columns": [
+            "text"
+        ]
+    },
+    "qwq_cot:CHAT_TEMPLATE": {
+        "name": "amphora/QwQ-LongCoT-130K",
+        "subset": "default",
+        "columns": [
+            "problem",
+            "qwq"
+        ],
+        "chat_template": [
+            "user",
+            "assistant"
+        ]
+    }
+}

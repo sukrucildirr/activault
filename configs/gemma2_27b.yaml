@@ -1,0 +1,21 @@
+run_name: gemma2_27b
+num_runs: 1 # Increase this!
+transformer_config:
+  model_name: google/gemma-2-27b-it
+  dtype: bfloat16
+  cache_dir: /cache
+  max_per_device_memory: 60GB
+data_config:
+  bucket_name: main
+  data_key: web-instruct:CHAT_TEMPLATE
+  n_batches: 150 # 250000
+  seq_length: 2048
+  batch_size: 4
+  seed: 42
+  skip_cache: False
+  start_batch: 0 
+  clean_added_tokens: True
+  clean_default_system_prompt: True
+upload_config:
+  batches_per_upload: 32 
+  hooks: ["blocks.6.hook_resid_post", "blocks.12.hook_resid_post", "blocks.18.hook_resid_post", "blocks.24.hook_resid_post"]
