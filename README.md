@@ -1,6 +1,14 @@
-# activault
+# Activault
+• **Activault** is an activation data engine that dramatically reduces costs for training interpreter models on frontier LLMs.
 
-> (TODO: link to blog post, write introduction, and citation)
+• Collects and stores model activations (the model's "mental state") efficiently using S3 object storage, reducing activation management costs by 4-8x.
+
+• Enables reproducible and shareable interpretability research through standardized object storage.
+
+• Maintains peak efficiency and throughput while handling petabyte-scale activation datasets.
+
+
+You can read about Activault at our [blog post](https://www.tilderesearch.com/blog/activault).
 
 > ⚠️ **CRITICAL WARNING**  
 > Streaming/storing activations with Activault can be expensive ($$$) and slow if care is not taken before launching large-scale jobs. We recommend users set up their compute environment in the same region/data center as their s3 solution to ensure minimal latency and avoid egress fees. We also **strongly** recommend users consult the pricing page for their s3 solution to ensure they understand the costs associated with their jobs.
@@ -257,6 +265,8 @@ A few reasons:
 2. Activault does not use the `generate` method and prefill speeds are more comparable between the public libraries.
 3. Activault should be compatible with as many models as possible.
 4. `vllm` does not play nice with procuring internal states.
+
+That said, we welcome contributions to expand activault's support for more efficient inference libraries.
 
 ### Why does activault not use `nnsight` or `transformer-lens`?
 
