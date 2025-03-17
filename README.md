@@ -1,21 +1,18 @@
 # Activault
-• **Activault** is an activation data engine that dramatically reduces costs for training interpreter models on frontier LLMs.
-
-• Collects and stores model activations (the model's "mental state") efficiently using S3 object storage, reducing activation management costs by 4-8x.
-
-• Enables reproducible and shareable interpretability research through standardized object storage.
-
-• Maintains peak efficiency and throughput while handling petabyte-scale activation datasets.
+**Activault** is an activation data engine that dramatically reduces costs for training interpreter models on frontier LLMs:
+- Collects and stores model activations (the model's "mental state") efficiently using S3 object storage, reducing activation management costs by 4-8x.
+- Enables reproducible and shareable interpretability research through standardized object storage.
+- Maintains peak efficiency and throughput while handling petabyte-scale activation datasets.
 
 
-You can read about Activault at our [blog post](https://www.tilderesearch.com/blog/activault).
+You can read about Activault in our [blog post](https://www.tilderesearch.com/blog/activault).
 
 > ⚠️ **CRITICAL WARNING**  
 > Streaming/storing activations with Activault can be expensive ($$$) and slow if care is not taken before launching large-scale jobs. We recommend users set up their compute environment in the same region/data center as their s3 solution to ensure minimal latency and avoid egress fees. We also **strongly** recommend users consult the pricing page for their s3 solution to ensure they understand the costs associated with their jobs.
 
 ## 💾 Activault principles
 
-When designing activault, we considered the tradeoffs between computing activations on-the-fly vs storing them on disk vs storing them in S3. Here's how the approaches compare:
+When designing Activault, we considered the tradeoffs between computing activations on-the-fly vs storing them on disk vs storing them in S3. Here's how the approaches compare:
 
 | Aspect | On-the-fly | Local Cache | Naive S3 | Activault |
 |--------|------------|-------------|----------|-----------|
@@ -155,7 +152,7 @@ Check Ray's dashboard periodically (typically at http://localhost:8265) for clus
 
 ### Running locally
 
-To run the pipeline locally, you can use the activault CLI:
+To run the pipeline locally, you can use the Activault CLI:
 ```bash
 activault collect --config configs/your_config.yaml
 ```
@@ -179,7 +176,7 @@ First, make sure your S3 bucket name is set:
 export S3_BUCKET_NAME=<your_bucket>
 ```
 
-Then, launch the S3 shell using the activault CLI:
+Then, launch the S3 shell using the Activault CLI:
 ```bash
 activault s3
 ```
@@ -254,11 +251,11 @@ See `retrieve.py` for a complete example.
 
 Yes! This is the intended goal. RCache can be used out of box in SAE training workflows. It supports blazing fast throughput to ensure training is always FLOP-bottlencked, not IO-bottlencked.
 
-### What platforms is activault built for?
+### What platforms is Activault built for?
 
 Activault is designed to be compatible with any S3-style object storage solution. We performed most of our testing on Nebius S3 and have also tested on AWS S3. It is possible that other platforms may encounter issues, and we welcome contributions to expand support.
 
-### Why does activault use `transformers` instead of a more efficient inference library such as `vllm`?
+### Why does Activault use `transformers` instead of a more efficient inference library such as `vllm`?
 
 A few reasons:
 1. The main reason is that the bottleneck is upload speed not throughput. We experimented with using much faster internal serving engines but the main process ran far ahead of the save processes and there was no real gain in overall time.
@@ -266,15 +263,15 @@ A few reasons:
 3. Activault should be compatible with as many models as possible.
 4. `vllm` does not play nice with procuring internal states.
 
-That said, we welcome contributions to expand activault's support for more efficient inference libraries.
+That said, we welcome contributions to expand Activault's support for more efficient inference libraries.
 
-### Why does activault not use `nnsight` or `transformer-lens`?
+### Why does Activault not use `nnsight` or `transformer-lens`?
 
 We do not use libraries such as `nnsight` or `transformer-lens` to minimize dependencies and potential failure points, and to ensure maximal compatibility with a wide range of models.
 
 ### Activault doesn't (support vision models/get the activations I need/work for my storage solution)!
 
-We welcome contributions! Please open an issue or PR. We are releasing activault as a community tool, to enable low-resource users to collect activations, run experiments, and share data to analyze frontier open-weight models. 
+We welcome contributions! Please open an issue or PR. We are releasing Activault as a community tool to enable low-resource users to collect activations, run experiments, and share data to analyze frontier open-weight models. 
 
 
 ## 👥 Credits
