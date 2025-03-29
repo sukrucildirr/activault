@@ -251,6 +251,38 @@ class DataLoader:
         self.processed_batches = 0
         return self
 
+    @staticmethod
+    def _fix_chat_sequence(messages: List[Dict[str, str]]) -> List[Dict[str, str]]:
+        """Ensure chat messages follow the required alternating pattern."""
+        if not messages:
+            return [{"role": "user", "content": ""}]
+        
+        fixed = []
+        # Handle optional system message
+        if messages[0]["role"] == "system":
+            fixed.append(messages[0])
+            messages = messages[1:]
+        
+        # Start with user if no messages or last was assistant
+        if not messages or (fixed and fixed[-1]["role"] == "assistant") or messages[0]["role"] == "assistant":
+            fixed.append({"role": "user", "content": ""})
+        
+        # Process remaining messages ensuring alternation
+        for msg in messages:
+            # Skip if would violate alternation
+            if fixed and msg["role"] == fixed[-1]["role"]:
+                continue
+            # Add dummy message if needed to maintain alternation
+            if fixed and fixed[-1]["role"] not in ["user", "assistant"]:
+                fixed.append({"role": "user" if msg["role"] == "assistant" else "assistant", "content": ""})
+            fixed.append(msg)
+        
+        # Ensure we end with assistant response
+        if not fixed or fixed[-1]["role"] == "user":
+            fixed.append({"role": "assistant", "content": ""})
+        
+        return fixed
+
     def __next__(self) -> Dict[str, torch.Tensor]:
         if (
             self.batches_per_machine is not None
@@ -272,9 +304,9 @@ class DataLoader:
                     sample = next(self.dataset_iter)["text"]
 
                 if self.apply_chat_template:
-                    sample = self.tokenizer.apply_chat_template(
-                        [self._convert_chat_format(s) for s in sample], tokenize=False
-                    )
+                    messages = [self._convert_chat_format(s) for s in sample]
+                    messages = self._fix_chat_sequence(messages)
+                    sample = self.tokenizer.apply_chat_template(messages, tokenize=False)
 
                 tokenized = self.tokenizer(sample, truncation=False, return_attention_mask=False)
 
