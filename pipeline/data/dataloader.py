@@ -25,7 +25,7 @@ logger = logging.getLogger(__name__)
 
 # If your samples are very short and you are cleaning tokens, you may need to increase this.
 # Alternatively, you can reduce this for higher efficiency.
-MAX_N_PACKED = 8
+MAX_N_PACKED = 12
 
 
 class DataLoader:
@@ -163,10 +163,28 @@ class DataLoader:
     @staticmethod
     def _convert_chat_format(msg: Dict[str, str]) -> Dict[str, str]:
         """Unify chat message formats."""
-        if "role" in msg:
-            return msg
-        role_map = {"human": "user", "gpt": "assistant", "system": "system"}
-        return {"role": role_map[msg["from"]], "content": msg["value"]}
+        try:
+            # If already in correct format, validate fields
+            if "role" in msg:
+                if not isinstance(msg.get("content"), str):
+                    # Default to empty string if content is None or invalid
+                    msg["content"] = ""
+                if not isinstance(msg.get("role"), str):
+                    # Default to user if role is None or invalid
+                    msg["role"] = "user"
+                return msg
+            
+            # Convert from old format
+            if not isinstance(msg.get("from"), str) or not isinstance(msg.get("value"), str):
+                # Default to empty message if fields are invalid
+                return {"role": "user", "content": ""}
+            
+            role_map = {"human": "user", "gpt": "assistant", "system": "system"}
+            role = role_map.get(msg["from"], "user")  # Default to user if unknown role
+            return {"role": role, "content": msg["value"]}
+        except Exception as e:
+            logger.warning(f"Error converting chat format for message: {msg}. Error: {e}")
+            return {"role": "user", "content": ""}  # Return safe default
 
     def _clean_sequence(self, input_ids: torch.Tensor) -> tuple[List[int], List[bool]]:
         """Clean a sequence by removing invalid tokens."""
