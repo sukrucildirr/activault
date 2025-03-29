@@ -16,8 +16,12 @@ class CommandHistory:
             # Set history file
             readline.set_history_length(1000)
             try:
-                readline.read_history_file(histfile)
-            except FileNotFoundError:
+                # Only try to read history file if it exists
+                if os.path.exists(histfile):
+                    readline.read_history_file(histfile)
+            except OSError:
+                # Handle any OS errors when reading history
+                print(f"Warning: Could not read history file {histfile}")
                 pass
 
         # Enable tab completion and better key bindings
