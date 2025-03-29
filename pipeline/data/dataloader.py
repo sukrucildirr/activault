@@ -184,7 +184,7 @@ class DataLoader:
             # Remove both sys prompt
             for sys_str in [self.tokenized_system_prompt]:
                 cutoff_len = len(sys_str)
-                if cutoff_len > 0:
+                if cutoff_len > 0 and len(ids) >= cutoff_len:
                     windows = np.lib.stride_tricks.sliding_window_view(ids, cutoff_len)
                     matches = np.all(windows == sys_str, axis=1)
                     match_positions = np.where(matches)[0]
