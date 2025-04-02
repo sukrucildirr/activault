@@ -18,4 +18,11 @@ data_config:
   # clean_default_system_prompt: True # Cohere has a long system prompt
 upload_config:
   batches_per_upload: 16
-  hooks: ["blocks.12.hook_resid_post", "blocks.24.hook_resid_post", "blocks.36.hook_resid_post"]
+  hooks: [
+    "models.layers.12.self_attn.pre", "models.layers.12.self_attn.post",
+    "models.layers.12.mlp.pre", "models.layers.12.mlp.post",
+    "models.layers.24.self_attn.pre", "models.layers.24.self_attn.post",
+    "models.layers.24.mlp.pre", "models.layers.24.mlp.post",
+    "models.layers.36.self_attn.pre", "models.layers.36.self_attn.post",
+    "models.layers.36.mlp.pre", "models.layers.36.mlp.post"
+  ]

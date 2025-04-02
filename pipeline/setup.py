@@ -50,7 +50,7 @@ def setup_model_and_tokenizer(
             "model_name": "gpt2",
             "dtype": "float16"
         }
-        model, tokenizer = setup_model_and_tokenizer(config, hooks=["blocks.0.hook_resid_post"])
+        model, tokenizer = setup_model_and_tokenizer(config, hooks=["models.layers.24.mlp.post"])
         ```
     """
     tokenizer = AutoTokenizer.from_pretrained(transformer_config["model_name"])
@@ -74,7 +74,7 @@ def setup_model_and_tokenizer(
         import gc
 
         # Find the highest layer number from hooks
-        layer_numbers = [int(hook.split(".")[1]) for hook in hooks]
+        layer_numbers = [int(hook.split(".")[2]) for hook in hooks if hook.startswith("models.layers")]
         max_layer = max(layer_numbers)
 
         # Print model size before truncation
@@ -104,7 +104,7 @@ def setup_model_and_tokenizer(
         )
     else:
         logger.info("No hooks provided, using all layers")
-        hooks = [f"blocks.{i}.hook_resid_post" for i in range(model.config.num_hidden_layers)]
+        hooks = [f"models.layers.{i}.mlp.post" for i in range(model.config.num_hidden_layers)]
 
     decoder_cls = model.model.layers[0].__class__.__name__
 
@@ -143,33 +143,56 @@ def maybe_add_mlp_attn_hooks(model: AutoModelForCausalLM, hooks: List[str] = Non
     hook_activations = {}
 
     for hook in list(hooks):
-        if "mlp" in hook:
-            layer_idx = int(hook.split(".")[1])
+        layer_idx = int(hook.split(".")[2])
 
-            def get_mlp_output_hook(layer_idx):
-                def output_hook(module, input, output):
-                    hook_activations[f"blocks.{layer_idx}.hook_mlp_out"] = output
+        if "mlp.pre" in hook:
+            def get_mlp_pre_hook(layer_idx):
+                def pre_hook(module, input):
+                    if input and isinstance(input, tuple) and len(input) > 0:
+                        hook_activations[f"models.layers.{layer_idx}.mlp.pre"] = input[0]
+                return pre_hook
 
-                return output_hook
+            pytorch_hook = get_mlp_pre_hook(layer_idx)
+            model.model.layers[layer_idx].mlp.register_forward_pre_hook(pytorch_hook)
+            pytorch_hooks.append(pytorch_hook)
+            logger.info(f"Added MLP pre hook for layer {layer_idx}")
 
-            pytorch_hook = get_mlp_output_hook(layer_idx)
+        if "mlp.post" in hook:
+            def get_mlp_post_hook(layer_idx):
+                def post_hook(module, input, output):
+                    # MLP output is a direct tensor
+                    hook_activations[f"models.layers.{layer_idx}.mlp.post"] = output
+                return post_hook
+
+            pytorch_hook = get_mlp_post_hook(layer_idx)
             model.model.layers[layer_idx].mlp.register_forward_hook(pytorch_hook)
             pytorch_hooks.append(pytorch_hook)
-            logger.info(f"Added MLP output hook for layer {layer_idx}")
+            logger.info(f"Added MLP post hook for layer {layer_idx}")
 
-        if "attn" in hook:
-            layer_idx = int(hook.split(".")[1])
+        if "self_attn.pre" in hook:
+            def get_attn_pre_hook(layer_idx):
+                def pre_hook(module, input):
+                    if input and isinstance(input, tuple) and len(input) > 0:
+                        hook_activations[f"models.layers.{layer_idx}.self_attn.pre"] = input[0]
+                return pre_hook
 
-            def get_attn_output_hook(layer_idx):
-                def output_hook(module, input, output):
-                    hook_activations[f"blocks.{layer_idx}.hook_attn_out"] = output
+            pytorch_hook = get_attn_pre_hook(layer_idx)
+            model.model.layers[layer_idx].self_attn.register_forward_pre_hook(pytorch_hook)
+            pytorch_hooks.append(pytorch_hook)
+            logger.info(f"Added attention pre hook for layer {layer_idx}")
 
-                return output_hook
+        if "self_attn.post" in hook:
+            def get_attn_post_hook(layer_idx):
+                def post_hook(module, input, output):
+                    # Attention output is a tuple, we want the first element
+                    if isinstance(output, tuple) and len(output) > 0:
+                        hook_activations[f"models.layers.{layer_idx}.self_attn.post"] = output[0]
+                return post_hook
 
-            pytorch_hook = get_attn_output_hook(layer_idx)
+            pytorch_hook = get_attn_post_hook(layer_idx)
             model.model.layers[layer_idx].self_attn.register_forward_hook(pytorch_hook)
             pytorch_hooks.append(pytorch_hook)
-            logger.info(f"Added attention output hook for layer {layer_idx}")
+            logger.info(f"Added attention post hook for layer {layer_idx}")
 
     return pytorch_hooks, hook_activations
 
@@ -192,7 +215,7 @@ def setup_uploaders(
         ```python
         uploaders = setup_uploaders(
             "experiment_1",
-            hooks=["blocks.0.hook_resid_post"],
+            hooks=["models.layers.0.mlp.post"],
             batches_per_upload=10
         )
         ```

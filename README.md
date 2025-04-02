@@ -191,7 +191,7 @@ In the S3 shell, navigate to your run directory and use these commands:
 Example inspection output:
 
 ```
-s3://main/testing/blocks.24.hook_resid_post> inspect 1
+s3://main/testing/models.layers.24.mlp.post> inspect 1
 Inspecting file: /tmp/0f909221-ff28-4a94-a43f-cfe973e835cf--5_0.saved.pt
 
 PT File Inspection:

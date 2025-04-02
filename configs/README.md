@@ -30,8 +30,8 @@ data_config:                       # Dataset and processing configurations
 upload_config:                     # Upload behavior and hook specifications
   batches_per_upload: 8            # Number of batches to accumulate before upload
   hooks:                           # List of activation hooks to capture
-    - "blocks.24.hook_resid_post"
-    - "blocks.36.hook_mlp_post"
+    - "models.layers.24.mlp.post"
+    - "models.layers.36.mlp.post"
 ```
 
 ## Configuration Fields
@@ -63,7 +63,7 @@ upload_config:                     # Upload behavior and hook specifications
 ### Upload Config
 
 - `batches_per_upload` (required): Number of batches to accumulate before uploading to S3
-- `hooks` (required): List of activation hooks to capture (format: "blocks.{layer}.hook_resid_post")
+- `hooks` (required): List of activation hooks to capture (format: "models.layers.{layer}.{self_attn|mlp}.{pre|post}")
 
 ## Example Configurations
 

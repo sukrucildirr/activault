@@ -18,4 +18,13 @@ data_config:
   # clean_default_system_prompt: True # Mistral has a long system prompt
 upload_config:
   batches_per_upload: 32 
-  hooks: ["blocks.4.hook_resid_post", "blocks.4.hook_attn_post", "blocks.12.hook_resid_post", "blocks.12.hook_mlp_post", "blocks.20.hook_resid_post", "blocks.20.hook_attn_post", "blocks.28.hook_resid_post", "blocks.28.hook_mlp_post"]
+  hooks: [
+    "models.layers.4.self_attn.pre", "models.layers.4.self_attn.post",
+    "models.layers.4.mlp.pre", "models.layers.4.mlp.post",
+    "models.layers.12.self_attn.pre", "models.layers.12.self_attn.post",
+    "models.layers.12.mlp.pre", "models.layers.12.mlp.post",
+    "models.layers.20.self_attn.pre", "models.layers.20.self_attn.post",
+    "models.layers.20.mlp.pre", "models.layers.20.mlp.post",
+    "models.layers.28.self_attn.pre", "models.layers.28.self_attn.post",
+    "models.layers.28.mlp.pre", "models.layers.28.mlp.post"
+  ]

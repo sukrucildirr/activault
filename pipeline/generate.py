@@ -91,7 +91,7 @@ def generate_activations(
             norm_counts[hook] = config.batches_processed
 
     # Prepare for activation collection
-    layers = {hook: int(hook.split(".")[1]) for hook in hooks}
+    layers = {hook: int(hook.split(".")[2]) for hook in hooks}
 
     # Initialize batches processed from config
     batches_processed = config.batches_processed
@@ -134,14 +134,22 @@ def generate_activations(
             for hook in hooks:
                 if hook in hook_activations:
                     activations[hook] = {
-                        "states": hook_activations[hook]["states"],
+                        "states": hook_activations[hook],
                         "input_ids": batch["input_ids"],
                     }
                 else:
-                    activations[hook] = {
-                        "states": outputs.hidden_states[layers[hook] + 1],
-                        "input_ids": batch["input_ids"],
-                    }
+                    # Handle pre and post hooks separately
+                    layer_idx = int(hook.split(".")[2])
+                    if "pre" in hook:
+                        activations[hook] = {
+                            "states": outputs.hidden_states[layer_idx],
+                            "input_ids": batch["input_ids"],
+                        }
+                    elif "post" in hook:
+                        activations[hook] = {
+                            "states": outputs.hidden_states[layer_idx + 1],
+                            "input_ids": batch["input_ids"],
+                        }
 
             try:
                 # Clean special tokens from activations (e.g. BOS)
