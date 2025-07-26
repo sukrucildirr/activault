@@ -82,7 +82,7 @@ s3://{bucket}/{run_name}/
 ## 🚀 Running Collection Jobs
 
 > 📢 **IMPORTANT**  
-> Ensure `n_runs` in the config file is set to the total number of runs you want to launch before runnign large-scale distributed jobs. if this is not done, you will generate redundant data.
+> Ensure `n_runs` in the config file is set to the total number of runs you want to launch before running large-scale distributed jobs. if this is not done, you will generate redundant data.
 
 ### Using Slurm (Traditional method)
 
